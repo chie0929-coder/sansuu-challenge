@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#314779">
+<title>夏音の算数チャレンジ！</title>
+<style>
+:root{--navy:#314779;--blue:#5276bd;--pale:#edf2ff;--ink:#24304a;--muted:#6d7890;--green:#16845b;--red:#c34e54;--gold:#f3bd42}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(160deg,#f3f6ff,#fff8ed);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;color:var(--ink);min-height:100vh}
+main{width:min(720px,100%);margin:0 auto;padding:18px 16px 40px}
+header{background:var(--navy);color:white;border-radius:24px;padding:20px 20px 18px;box-shadow:0 8px 24px #263b7026}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{font-size:clamp(23px,5vw,31px);margin:0;font-weight:850;letter-spacing:.02em}
+.logo{font-size:32px}
+header p{color:#dce6ff;margin:8px 0 16px;font-size:14px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#ffffff20;border-radius:14px;padding:10px 13px}
+.stat small{display:block;color:#dce6ff;font-size:12px}
+.stat strong{font-size:23px}
+.panel{background:white;border:1px solid #e8ebf4;border-radius:22px;padding:20px;margin-top:16px;box-shadow:0 5px 18px #263b700c}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tag{background:var(--pale);color:var(--navy);padding:7px 11px;border-radius:999px;font-weight:750;font-size:13px}
+.progress{height:9px;background:#edf0f6;border-radius:99px;overflow:hidden;margin:15px 0 4px}
+.progress>div{height:100%;width:0;background:linear-gradient(90deg,#6b91db,#6cc5a2);transition:width .25s}
+.question{font-size:clamp(29px,7vw,43px);font-weight:850;text-align:center;margin:28px 0 24px;line-height:1.35;overflow-wrap:anywhere}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.choice{border:2px solid #e4e9f3;background:#fbfcff;border-radius:16px;padding:17px 8px;font-size:clamp(20px,5vw,25px);font-weight:800;color:var(--ink);cursor:pointer;min-height:68px}
+.choice:active{transform:scale(.98)}
+.choice:disabled{cursor:default;opacity:1}
+.choice.correct{background:#e8f7ef;border-color:#64bd91;color:#126b49}
+.choice.wrong{background:#fff0f0;border-color:#df9295;color:#a53a40}
+.feedback{min-height:30px;text-align:center;font-weight:750;margin:14px 0 0}
+.feedback.good{color:var(--green)}.feedback.bad{color:var(--red)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:17px}
+button.primary,button.secondary{border:0;border-radius:14px;padding:14px 18px;font-size:16px;font-weight:800;cursor:pointer}
+button.primary{background:var(--blue);color:white;flex:1}
+button.secondary{background:#eef1f7;color:var(--navy)}
+button:focus-visible{outline:3px solid #f2bd42;outline-offset:3px}
+.hidden{display:none!important}
+.center{text-align:center}
+.bigemoji{font-size:54px;margin:4px 0}
+.resulttitle{font-size:27px;font-weight:850;margin:8px 0}
+.sub{color:var(--muted);font-size:14px;line-height:1.7}
+.reviewitem{padding:12px 0;border-bottom:1px solid #edf0f5}
+.reviewitem:last-child{border:0}
+.reviewitem strong{display:block;margin-bottom:4px}
+.pill{display:inline-block;border-radius:99px;background:#f0f3fa;padding:4px 9px;font-size:12px;color:var(--muted);margin-right:5px}
+footer{text-align:center;color:#8a93a6;font-size:12px;margin:18px 0}
+@media(max-width:390px){main{padding:12px}.panel{padding:16px}.choice{min-height:62px}}
+</style>
+</head>
+<body>
+<main>
+<header>
+ <div class="top"><h1>夏音の算数チャレンジ！</h1><div class="logo">⭐</div></div>
+ <p>今日も10問、楽しくチャレンジしよう！</p>
+ <div class="stats">
+  <div class="stat"><small>今回の正解</small><strong id="score">0 / 10</strong></div>
+  <div class="stat"><small>これまでのクリア</small><strong id="clears">0 回</strong></div>
+ </div>
+</header>
+
+<section class="panel" id="quiz">
+ <div class="row"><span class="tag" id="qnum">第1問 / 10問</span><span class="pill" id="topic">小数のかけ算</span></div>
+ <div class="progress"><div id="bar"></div></div>
+ <div class="question" id="question">3.6 × 2.5 ＝ ？</div>
+ <div class="choices" id="choices"></div>
+ <div class="feedback" id="feedback" aria-live="polite"></div>
+ <div class="actions"><button class="primary hidden" id="next">次の問題へ</button></div>
+</section>
+
+<section class="panel hidden center" id="result">
+ <div class="bigemoji" id="resultEmoji">🎉</div>
+ <div class="resulttitle" id="resultTitle">チャレンジ成功！</div>
+ <div id="resultScore" style="font-size:22px;font-weight:850"></div>
+ <div class="sub" id="roundInfo"></div>
+ <p class="sub" id="resultMessage"></p>
+ <div class="actions"><button class="primary" id="again">次の10問にチャレンジ！</button><button class="secondary" id="reviewToggle">まちがえた問題を見る</button></div>
+ <div id="review" class="hidden" style="text-align:left;margin-top:16px"></div>
+</section>
+<footer>小学5年生向け・10問中8問正解でクリア！</footer>
+</main>
+<script>
+const bank = [
+ {t:"小数のかけ算",q:"3.6 × 2.5",a:"9",o:["8","9","9.5","10"]},
+ {t:"小数のわり算",q:"7.2 ÷ 0.8",a:"9",o:["8","9","0.9","90"]},
+ {t:"小数の計算",q:"12.5 − 3.78",a:"8.72",o:["8.72","9.28","8.82","9.72"]},
+ {t:"小数の計算",q:"4.8 ＋ 2.65",a:"7.45",o:["7.35","7.45","6.45","7.55"]},
+ {t:"分数のたし算",q:"1/3 ＋ 1/6",a:"1/2",o:["2/9","1/2","2/3","1/6"]},
+ {t:"分数のひき算",q:"5/6 − 1/3",a:"1/2",o:["1/3","1/2","2/3","4/3"]},
+ {t:"整数のかけ算",q:"125 × 24",a:"3000",o:["2500","2800","3000","3200"]},
+ {t:"整数のわり算",q:"936 ÷ 24",a:"39",o:["38","39","40","49"]},
+ {t:"平均",q:"80点・70点・90点の平均は？",a:"80点",o:["70点","75点","80点","90点"]},
+ {t:"割合",q:"200円の30％は？",a:"60円",o:["30円","50円","60円","70円"]},
+ {t:"割合",q:"40人のクラスで、10人は全体の何％？",a:"25％",o:["10％","20％","25％","40％"]},
+ {t:"単位量あたり",q:"150kmを3時間で進む速さは？",a:"時速50km",o:["時速30km","時速45km","時速50km","時速60km"]},
+ {t:"体積",q:"たて4cm、横3cm、高さ5cmの直方体の体積は？",a:"60cm³",o:["12cm³","20cm³","60cm³","100cm³"]},
+ {t:"面積",q:"底辺8cm、高さ5cmの三角形の面積は？",a:"20cm²",o:["13cm²","20cm²","40cm²","80cm²"]},
+ {t:"文章問題",q:"1本120円のえんぴつを4本買うと？",a:"480円",o:["420円","460円","480円","520円"]},
+ {t:"文章問題",q:"2.4Lのジュースを0.6Lずつ分けると何人分？",a:"4人分",o:["3人分","4人分","5人分","6人分"]},
+ {t:"小数のかけ算",q:"0.7 × 0.6",a:"0.42",o:["0.13","0.42","4.2","42"]},
+ {t:"小数のわり算",q:"5.4 ÷ 0.6",a:"9",o:["0.9","8","9","90"]},
+ {t:"分数",q:"3/4 は 1/4 の何倍？",a:"3倍",o:["2倍","3倍","4倍","6倍"]},
+ {t:"割合",q:"定価1000円の品物が20％引き。代金は？",a:"800円",o:["200円","700円","800円","980円"]}
+];
+let questions=[], index=0, score=0, mistakes=[], answered=false;
+let clears=Number(localStorage.getItem("mathChallengeClears")||0);
+let rounds=Number(localStorage.getItem("mathChallengeRounds")||0);
+document.getElementById("clears").textContent=clears+" 回";
+const $=id=>document.getElementById(id);
+function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function start(){
+ questions=shuffle(bank).slice(0,10); index=0;score=0;mistakes=[];answered=false;
+ $("quiz").classList.remove("hidden");$("result").classList.add("hidden");render();
+}
+function render(){
+ const item=questions[index];answered=false;
+ $("score").textContent=score+" / 10";$("qnum").textContent=`第${index+1}問 / 10問`;
+ $("topic").textContent=item.t;$("question").textContent=item.q+" ＝ ？";
+ $("bar").style.width=(index/10*100)+"%";$("feedback").textContent="";$("feedback").className="feedback";
+ $("next").classList.add("hidden");
+ const opts=shuffle(item.o);
+ $("choices").innerHTML="";
+ opts.forEach(v=>{
+  const b=document.createElement("button");b.className="choice";b.textContent=v;b.addEventListener("click",()=>answer(v,b));$("choices").appendChild(b);
+ });
+}
+function answer(value,button){
+ if(answered)return;answered=true;
+ const item=questions[index];const ok=value===item.a;
+ if(ok){score++;$("feedback").textContent="せいかい！いいね！ ⭐";$("feedback").className="feedback good";}
+ else{mistakes.push({q:item.q,a:item.a,your:value,t:item.t});$("feedback").textContent=`おしい！正解は「${item.a}」だよ。`;$("feedback").className="feedback bad";}
+ [...$("choices").children].forEach(b=>{b.disabled=true;if(b.textContent===item.a)b.classList.add("correct");else if(b===button&&!ok)b.classList.add("wrong");});
+ $("score").textContent=score+" / 10";
+ $("next").textContent=index===9?"結果を見る":"次の問題へ";$("next").classList.remove("hidden");
+}
+$("next").addEventListener("click",()=>{if(index<9){index++;render()}else finish()});
+function finish(){
+ rounds++;localStorage.setItem("mathChallengeRounds",rounds);
+ $("roundInfo").textContent=`今回で ${rounds} セット目！「次の10問にチャレンジ！」を押すと、新しい問題が始まるよ。`;
+ $("quiz").classList.add("hidden");$("result").classList.remove("hidden");
+ const passed=score>=8;
+ $("resultEmoji").textContent=passed?"🏆":"💪";
+ $("resultTitle").textContent=passed?"チャレンジ成功！":"おつかれさま！";
+ $("resultScore").textContent=`10問中 ${score}問 正解`;
+ $("resultMessage").textContent=passed?"合格ラインの8問正解をクリア！すごいね！":"あと少し！まちがえた問題を見直して、もう一度チャレンジしてみよう。";
+ if(passed){clears++;localStorage.setItem("mathChallengeClears",clears);$("clears").textContent=clears+" 回";}
+ $("reviewToggle").classList.toggle("hidden",mistakes.length===0);
+ $("review").classList.add("hidden");$("review").innerHTML=mistakes.map(m=>`<div class="reviewitem"><span class="pill">${m.t}</span><strong>${escapeHtml(m.q)}</strong><span class="sub">あなたの答え：${escapeHtml(m.your)} ／ 正解：${escapeHtml(m.a)}</span></div>`).join("");
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+$("again").addEventListener("click",start);
+$("reviewToggle").addEventListener("click",()=>{$("review").classList.toggle("hidden");$("reviewToggle").textContent=$("review").classList.contains("hidden")?"まちがえた問題を見る":"とじる"});
+start();
+</script>
+</body>
+</html>
