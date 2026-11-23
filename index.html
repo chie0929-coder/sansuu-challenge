@@ -145,7 +145,7 @@ function render(){
 function answer(value,button){
  if(answered)return;answered=true;
  const item=questions[index];const ok=value===item.a;
- if(ok){score++;$("feedback").textContent="せいかい！いいね！ ⭐";$("feedback").className="feedback good";}
+ if(ok){score++;$("feedback").textContent="正解！いいね！ ⭐";$("feedback").className="feedback good";}
  else{mistakes.push({q:item.q,a:item.a,your:value,t:item.t});$("feedback").textContent=`おしい！正解は「${item.a}」だよ。`;$("feedback").className="feedback bad";}
  [...$("choices").children].forEach(b=>{b.disabled=true;if(b.textContent===item.a)b.classList.add("correct");else if(b===button&&!ok)b.classList.add("wrong");});
  $("score").textContent=score+" / 10";
