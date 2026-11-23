@@ -154,9 +154,16 @@ function answer(value,button){
 $("next").addEventListener("click",()=>{if(index<9){index++;render()}else finish()});
 function finish(){
  rounds++;localStorage.setItem("mathChallengeRounds",rounds);
+ const passed=score>=8;
+ const history=JSON.parse(localStorage.getItem("mathChallengeHistory")||"[]");
+ history.unshift({
+  date:new Date().toLocaleString("ja-JP"),
+  score:score,
+  passed:passed
+ });
+ localStorage.setItem("mathChallengeHistory",JSON.stringify(history.slice(0,50)));
  $("roundInfo").textContent=`今回で ${rounds} セット目！「次の10問にチャレンジ！」を押すと、新しい問題が始まるよ。`;
  $("quiz").classList.add("hidden");$("result").classList.remove("hidden");
- const passed=score>=8;
  $("resultEmoji").textContent=passed?"🏆":"💪";
  $("resultTitle").textContent=passed?"チャレンジ成功！":"おつかれさま！";
  $("resultScore").textContent=`10問中 ${score}問 正解`;
