@@ -187,6 +187,27 @@ function finish(){
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 $("again").addEventListener("click",start);
 $("reviewToggle").addEventListener("click",()=>{$("review").classList.toggle("hidden");$("reviewToggle").textContent=$("review").classList.contains("hidden")?"まちがえた問題を見る":"とじる"});
+function showHistory(){
+ const history=JSON.parse(localStorage.getItem("mathChallengeHistory")||"[]");
+ $("historySummary").textContent=`これまで ${rounds} セット挑戦・${clears} 回クリア！`;$("historyList").innerHTML=history.length
+  ? history.map((h,i)=>`
+   <div class="reviewitem">
+    <strong>${i+1}. ${escapeHtml(h.date)}</strong>
+    <div>${h.score}問正解 ／ ${h.passed?"🏆 合格":"💪 もう一歩！"}</div>
+   </div>
+  `).join("")
+  : "<p>まだ学習履歴はありません。</p>";
+
+ $("result").classList.add("hidden");
+ $("historyScreen").classList.remove("hidden");
+}
+
+$("historyButton").addEventListener("click",showHistory);
+
+$("backToResult").addEventListener("click",()=>{
+ $("historyScreen").classList.add("hidden");
+ $("result").classList.remove("hidden");
+});
 start();
 </script>
 </body>
